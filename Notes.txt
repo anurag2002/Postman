@@ -1,0 +1,286 @@
+PostMan:
+
+What is Postman?
+Postman - API tool to develop and test (Manual/Automation) API/Webservices Tests with very minimal code and in quick and easy way.
+
+This tool comes with Powerful JavaScript Editor (Postman Object) which helps us to perform various assertions inside the tool to validate your Tests.
+Postman offers various ready-made features of Framework like Variables, Environments, Workflows, Data Driven components and PM object which helps to quickly setup automation lab for testing.
+
+Postman supports various types of services like Rest API's, Soap Web services, GraphQL Testing, etc. This tool comes with powerful integration of Newman tool to run the Automated Tests from CLI wihc can also be integrated with Jenkins for CI/CD integration.
+
+API:
+What is API?
+Application Programming Interface.
+API acts as an interface between the client and the server intened to simpily the building of client side software.
+API is independent of any language.
+
+End Point/Base URI: Address where API is hosted on the Server.
+
+HTTP Methods which are commonly used to communicate with REST API's are:
+1. GET - The GET Method is used to extract information from the given server using a given URI. WHile using GET request, it should only extract data and should have no other effect on the data. No payload/body required.	=> Fetch Information
+
+How to send input data in GET?
+=> Using Query Parameters.
+
+2. POST: A POST request is used to send data to the server using HTML Forms.	=>Send Information
+
+How to send input data in POST?
+=> Using Form Parameters/Body Payload
+
+3. PUT: Replaces all current representations of the target resource with the uploaded content.	=> Update Information
+
+4. DELETE: Removes all current representations of the target resource given by a URI.	=> Delete Information
+
+Create	=>	POST
+Read	=>	GET
+Update	=>	PUT
+Delete	=>	DELETE
+
+Resources: Resources represent API/Collection which can be accessed from the Server.
+Eg:
+google.com/maps
+google.com/search
+google.com/images
+
+Here 'maps','search','images' are the resources.
+
+Path Parameters: Path Parameters are variables parts of a URL Path. They are typically used to point to a specific resource within a collection, such as a user identified by ID.
+Eg:
+google.com/images/1371928
+google.com/docs/293479
+Here '293479', '1371928' are the Path Parameters.
+
+Query Parameter: Query Parameter is used to sort/filter the resources. Query parameters are identified with '?'.
+Eg:
+amazon.com/orders?sort_by=2/20/2020
+
+Headers/Cookies: Headers represent the meta-data associated with the API request and response. In layman terms, we were sending Additional details to API to process our request.
+Eg: Authorization Details
+
+End Point Request URL can be constructed as below:
+Base URL/resource/(Query/Path) Parameters
+
+What are Environments and variables in Postman?
+
+Environments: An environment is a set of variables you can use in your Postman requests. You can use environments to group related sets of values together and manage access to shared Postman data if you are working as part of a team.
+
+Variables: Variables allow you to store and reuse values in your requests and scripts. By storing a value in a variable, you can reference it throughout your collections, environments, and requests—and if you need to update the value, you only have to change it in one place. Using variables increases your ability to work efficiently and minimizes the likelihood of error.
+
+How to use variables?
+Variables are called in postman by using '{{variable_name}}'.
+
+Variable scopes
+Postman supports the following variable scopes:
+-> Global: The variables which are common to all the environments/current postman workspace are placed in Global. 
+-> Collection: The variables which are common to the current collection.
+-> Environment: These variables are environment dependable.
+-> Data: Used for Data driven testing from CSV or Excel
+-> Local: The variable which is valid to the particular request only.
+
+If we have a same variable with different scope, then the order of preference which will be followed will be:
+	Global < Collection < Environment < Data < Local	=> min to max
+
+Scripting in Postman
+Postman contains a powerful runtime based on Node.js that allows you to add dynamic behavior to requests and collections. This allows you to write test suites, build requests that can contain dynamic parameters, pass data between requests, 
+
+Execution order of the scripts:
+	Request (Pre-request script) -> Request -> Response -> Request (test script)
+	
+-> A pre-request script associated with a request will be executed before the request is sent.
+-> A test script associated with a request will execute after the request is sent.
+
+The Postman(pm) object:
+You will carry out most of the Postman JavaScript API functionality using “pm” which provides access to request and response data, and variables.
+
+
+Postman Scripting:
+For Postman scripting, we need to follow the below rules:
+1. all the statements will be starting with - pm
+2. To get the JSON Response: to check the data from response, we need to first assign the json data into a variable.
+	Syntax: 
+			const jsonData = pm.response.json();
+3. to check the status code:
+		pm.response.to.have.status(200);
+4. to check if a property is present or not:
+		pm.expect(jsonData).have.property("Msg");
+			//here we pass the property name as the argument to the property()
+5. to compare the value of the property
+		pm.expect(jsonData.Msg).to.eql("Book Already Exists");
+			//here with jsonData, we mention the property name and in the eql we mention the expected value.
+6. we need to use .to.have. everytime we need to compare the data and .have to check the property.
+7. to get the global variables:
+		pm.globals.get("variable_name");
+8. Dynamic variables: Postman defined dynamic variables. 
+		pm.variables.replaceIn('{{$randomFirstName}}');
+9. Collection Variables: Declare a collection variable in the collection and fetch or update its value using the get and set methods.
+		pm.collectionVariables.set("collection_variable",value);
+		pm.collectionVariables.get("collection_variable");
+10. Test Script:
+		pm.test("pass message", function() {
+			//condition
+		});
+11. check for headers:
+		pm.expect(response.headers.get("header_name"))
+12. check for response time:
+		pm.expect(pm.response.responseTime).to.be.below(1200);
+13. Assertions:
+		pm.expect(check_name)
+14. Check for response text:
+		pm.expect(pm.response.text()).to.include("successfully added");
+15. retrieve data from JSON Object:
+		json.key
+16. Environment Variables: Declare an environment variable for each environment and fetch or update its value using the get and set methods.
+		pm.collectionVariables.set("environment_variable",value);
+		pm.collectionVariables.get("environment_variable");
+17. Verify JSON Schema: JSON Schema is an outline of the complete JSON Response having details of all the fields which are mandatory/optional in the response, along with their type.
+		pm.response.to.have.jsonSchema(schema);
+18. To get JSON Data from request: There is no defined method to retrieve JSON object from request body. So we use the JSON.parse method to parse the raw request body to JSON format and then extract the data from it.
+		var req  = JSON.parse(pm.request.body.raw);
+19. Get the column data from a CSV file uploaded:
+		pm.collectionVariables.set("collection_variable", pm.iterationData.get("csv_column_name"));
+20. To execute any particular request in case the current request returns an error:
+	i. use try catch block to handle the exception
+		pm.execution.setNextRequest("nextRequestName");
+21. To fetch and set access token from response to global variable:
+		pm.environment.set("access_token", jsonData.access_token);
+22. To check the type of the variable:
+		pm.expect(variable_name).to.be.an("expected_type","not_found_message");
+		expected_type = object (to check if variable is an object or not)
+23. To check if the object has all the keys or not:
+		pm.expect(cypressObject).to.have.all.keys('courseTitle', 'price');
+24. To compare arrays:
+		pm.expect(actualCourses).to.eql(expectedCourses);
+		
+OAuth 2.0
+OAuth 2.0 is an industry standard protocol for authorization. It focuses on client developer simplicity while providing specific authorization flows for web applications, desktop applications, mobile phones and living room devices. 
+
+Client - Application where it is expecting to server. Eg: BookMyShow
+Client ID - ID that identifies the client on the google server - public
+Client Secret ID - password for that ID - private
+Resource Owner - Person performing all the operations
+Resource/Authorization server - Where all the resources are currently stored
+
+Why application rely on other (Google or Facebook) authentications?
+-> No Data breach - headaches for application
+-> Need not maintain user profile data
+-> allows richer websites by allowing disparate applications to talk to each other
+
+OAuth Link explained:
+1. scope - details needed from the user
+2. auth_url - with which server we are trying to authorize
+3. client_id - id of the client given by google during integration
+4. response_type - what response we need from google (in this case - code)
+5. redirect_url - redirect to which url after successful login
+6. state - security parameter (optional)
+
+code will come in the url post login, as google does not allow automation script for login purposes. This is the only manual task to be done.
+
+Mock Servers:
+A mock API server imitates a real API server by providing realistic mock API responses to requests
+Within Postman, you can make requests that return mock data defined if you do not have a production API ready, or you do not want to run your requetss against real data yet.
+
+Postman and SOAP Webservices:
+How Soap Webservices are different from Rest Services?
+Rest API’s use HTTP protocol to send the request and receive the response
+Whereas Soap Webservices/API’s use Soap Protocol to send the request and receive the response
+In Soap Services, requests/responses are sent in XML Format.
+In SOAP, all the requests are POST.
+
+XML to JSON Conversion for SOAP:
+Soap uses XML format for request and response. so to convert it to JSON format for Postman scripts to work, we use - 'xml2Json()' function.
+Syntax:
+		const responseJson = xml2Json(pm.reponse.text());
+
+To get any object value from the response:
+Syntax:
+		responseJson["soap:Envelope"]["soap:Body"]
+
+Here we are using '[]' instead of '.' for traversing because Soap uses ':' which gives special character error in the script. So to avoid we use this format.
+
+
+Newman:
+What is Newman?
+Newman is a command line Collection Runner for Postman. 
+It allows you to run and test a Postman Collection directly from the command line.
+Using Newman, you can easily integrate it with your continuous integration servers and build systems.
+
+Install:
+		npm install -g newman						//for newman
+		npm install -g newman-reporter-htmlextra 	//for reports
+
+Syntax to execute tests using newman:
+	newman run Library.postman_collection.json -d AddBook.csv -e UAT.postman_environment.json -g workspace.postman_globals.json -r htmlextra
+
+1. Export - Collection, global variables, environment variables and csv to one folder
+2. Library.postman_collection.json - name of collection => write after run
+3. AddBook.csv - name of data driven csv file => write after '-d'
+4. UAT.postman_environment.json - name of environment variable file => write after '-e'
+5. workspace.postman_globals.json - name of global variable file => write after '-g'
+6. htmlextra - key for report => write after -r (-r htmlextra needs to be added at the end for reports)
+
+GraphQL:
+If we have a home page in which some specific data is to be displayed to the user from the API, but the API needs some other APIs as well to create the data to be displayed, so it will call all the required APIs. It will fetch the required data from response, but the API response will contain all the data which is also not required, which in turn will result in slowness and unsed data called. 
+
+GraphQL helps to resolve this by sending all the query to a single endpoint which will fetch only the neccessary data by talking to the neccessary endpoints, (like APIs, DBs and legacy system). GraphQL has a better performance.
+
+What is GraphQL?
+GraphQL is a query language and server-side runtime for fulfilling those queries on your existing data. GraphQL isn't tied to any specific database or storage engine and is instead backed by your existing code and data. 
+
+GraphQL Schema - What GraphQL can provide.
+
+Syntax:
+for Query:
+query($characterId:Int!)
+{
+  character(characterId:$characterId)
+  {
+    name
+    gender
+    status
+    id
+  }
+  characters(filters:{name:"Rahul"})
+  {
+    info 
+    {
+      count
+    }
+    result
+    {
+      name
+      type
+      id
+    }
+  }
+}
+
+Explaination:
+1. query - to tell this is a query
+2. ($characterId:Int!) - variables declared in GraphQL variables
+3. character - main field whose data needs to be fetched - can be considered as table
+4. (characterId:$characterId) - data to be fetched
+5. name,gender,status,id - columns/fields to be fetched
+6. (filters:{name:"Rahul"}) - if filter needs to be passed and the filter needs an object/another field - then the data to be searched is added in the '{}'
+7. info,result - table data to be fetched
+8. count, name, type, id - data required/output
+
+for mutation:
+mutation($locationName: String!)
+{
+  createLocation(location:{name: $locationName, type:"City", dimension:"102909"})
+  {
+    id
+  }
+  deleteLocations(locationIds:[23693,23694,23695,23696,23697])
+  {
+    locationsDeleted
+  }
+}
+
+Explaination:
+1. mutation - to tell this is a mutation
+2. ($locationName: String!) - variables declared in GraphQL variables
+3. createLocation - main field where data needs to be created - can be considered as table
+4. {name: $locationName, type:"City", dimension:"102909"}) - data to be created
+5. id - response of the create query
+6. (locationIds:[23693,23694,23695,23696,23697]) - if multiple data needs to be passed.
